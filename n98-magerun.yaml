@@ -1,0 +1,6 @@
+autoloaders:
+  Mpmd: %module%/src
+
+commands:
+   customCommands:
+       - Mpmd\Magento\CoreHacksCommand
