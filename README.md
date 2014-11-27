@@ -1,6 +1,8 @@
 # Magento Project Mess Detector
 
-Some additional commands for the excellent m98-magerun Magento command-line tool that will help you to find out how messed up a Magento instance is :)
+Some additional commands for the excellent n98-magerun Magento command-line tool that will help you to find out how messed up a Magento instance is :)
+
+Author: Fabrizio Branca
 
 ## Installation
 
