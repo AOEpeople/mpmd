@@ -2,7 +2,9 @@
 
 Some additional commands for the excellent n98-magerun Magento command-line tool that will help you to find out how messed up a Magento instance is :)
 
-Author: Fabrizio Branca
+So far there's only one single command (`mpmd:corehacks`), but more commands are planned to allow generating reports for code pool overwrites, themes, and some more checks.
+
+Author: [Fabrizio Branca](http://fbrnc.net)
 
 ## Installation
 
