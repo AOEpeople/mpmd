@@ -1,6 +1,6 @@
 # Magento Project Mess Detector
 
-Some additional commands for the excellent N98-MageRun Magento command-line tool.
+Some additional commands for the excellent m98-magerun Magento command-line tool that will help you to find out how messed up a Magento instance is :)
 
 ## Installation
 
@@ -8,17 +8,17 @@ There are a few options. You can check out the different options in the [MageRun
 
 Here's the easiest:
 
-1. Create ~/.n98-magerun/modules/ if it doesn't already exist.
+1. Create `~/.n98-magerun/modules/` if it doesn't already exist. (or `/usr/local/share/n98-magerun/modules` if you prefer that)
 ```
 mkdir -p ~/.n98-magerun/modules/
 ```
-2. Clone the magerun-addons repository in there
+2. Clone the mpmd repository in there. 
 ```
 git clone git@github.com:AOEpeople/mpmd.git ~/.n98-magerun/modules/mpmd
 ```
 3. It should be installed.To see that it was installed, check to see if one of the new commands is in there, like `diff:files`.
 ```
-n98-magerun diff:files
+n98-magerun mpmd:corehacks
 ```
 
 ## Commands
@@ -34,8 +34,8 @@ Arguments:
  skipDirectories       ':'-separated list of directories that will not be considered (defaults to '.svn:.git')
 ```
 
-This command requires a vanilla version of Magento (same version and edition!) to be present somewhere in the filesystem.
-It will then traverse all project files and compare them with the original file. 
+This command requires a vanilla version of Magento (same version and edition! Run `n98-magerun.phar sys:info` for more details) to be present somewhere in the filesystem.
+It will then traverse all project files and compare them with the original files. 
 This command will also be able to tell the difference between whitespace or code comments changes and real code changes.
 It will generate a HTML report that also includes the diffs.
 
@@ -55,4 +55,5 @@ Generating detailed HTML Report
 ```
 
 Report preview:
+
 ![Image](/docs/img/corehacks.jpg)
