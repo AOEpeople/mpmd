@@ -38,7 +38,7 @@ class Compare
         );
         if ($handle = opendir($baseDirA . $path)) {
             while ($file = readdir($handle)) {
-                if ($file == '.' || $file == '..' || in_array($file, $ignore)) {
+                if ($file == '.' || $file == '..' || in_array($file, $ignore) || ($path && in_array(ltrim($path, DIRECTORY_SEPARATOR), $ignore))) {
                     continue;
                 }
 

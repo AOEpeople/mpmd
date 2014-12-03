@@ -63,18 +63,22 @@ class CoreHacksCommand extends \N98\Magento\Command\AbstractMagentoCommand
 
         $this->_output->writeln("<info>Comparing project files in '$this->_magentoRootFolder' to vanilla Magento code in '$pathToVanillaCore'...</info>");
 
-        $skipDirectories = $this->_input->getArgument('skipDirectories');
-
-        if (empty($skipDirectories)) {
-            $skipDirectories = '.svn' . PATH_SEPARATOR . '.git';
+        $skipDirectories = array_filter(explode(PATH_SEPARATOR, $this->_input->getArgument('skipDirectories')));
+        if (!$skipDirectories) {
+            $skipDirectories = array(
+                '.svn',
+                '.git',
+            );
         }
+        array_walk($skipDirectories, 'self::stripSlashes');
+
         $compareUtil = new \Mpmd\Util\Compare();
 
         $data = $compareUtil->compareDirectories(
             $pathToVanillaCore,
             $this->_magentoRootFolder,
             '',
-            explode(PATH_SEPARATOR, $skipDirectories)
+            $skipDirectories
         );
 
         $table = array();
@@ -125,4 +129,14 @@ class CoreHacksCommand extends \N98\Magento\Command\AbstractMagentoCommand
         // if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
     }
 
+    /**
+     * Helper function to strip leading/trailing slashes, called by array_walk
+     *
+     * @param mixed $v Array value
+     * @param mixed $k Array key
+     */
+    public static function stripSlashes(&$v, $k)
+    {
+        $v = trim($v, '/');
+    }
 }
