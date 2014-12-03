@@ -4,3 +4,4 @@ autoloaders:
 commands:
    customCommands:
        - Mpmd\Magento\CoreHacksCommand
+       - Mpmd\Magento\CodePoolOverridesCommand

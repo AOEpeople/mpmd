@@ -90,79 +90,35 @@ class CoreHacksCommand extends \N98\Magento\Command\AbstractMagentoCommand
 
         if ($htmlReportOutputPath) {
 
+            foreach (array(\Mpmd\Util\Compare::DIFFERENT_FILE_CONTENT, \Mpmd\Util\Compare::SAME_FILE_BUT_COMMENTS) as $section) {
+                $diffs[$section] = $compareUtil->getDiffs(
+                    $data[$section],
+                    $pathToVanillaCore,
+                    $this->_magentoRootFolder
+                );
+            }
+
             $this->_output->writeln("<info>Generating detailed HTML Report</info>");
 
+            $htmlReport = new \Mpmd\Util\Report();
+            $htmlReport->addHeadline('Magento Project Mess Detector: Core Hacks Report');
+            $htmlReport->addTag('p', "Comparing <strong>$pathToVanillaCore</strong> to <strong>{$this->_magentoRootFolder}</strong>");
+
             $htmlTableRenderer = new \Mpmd\Util\HtmlTableRenderer();
-
-            $output = '<html>
-                <head>
-                    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-                    <script type="text/javascript">
-                        $(function () {
-                            $("pre.diff").before("<a class=\\"diff-toggle\\">[Toggle]</a>").hide();
-                            $(".diff-toggle").click(function () {
-                                $(this).next().toggle();
-                                return false;
-                            });
-                        })
-                    </script>
-                    <style type="text/css">
-                        body { font-family: Arial, sans-serif; font-size: 10pt; padding: 20px; }
-                        a, a:visited, a:hover { color: #E26912; text-decoration: underline; }
-                        table { background-color: whiteSmoke;  border-collapse: collapse; border-spacing: 0; margin-bottom: 10px; margin-top: 3px; border: 1px solid #fff; }
-                        table td, table th { padding: 0 20px; line-height: 20px; color: #0084B4; font-family: \'Helvetica Neue\', Helvetica, Arial, sans-serif; font-size: 14px; border-bottom: 1px solid #fff; border-top: 1px solid #fff; text-align: left; }
-                        table td:hover { background-color: #fff; }
-                        table th { background-color: #ccc; color: #333; font-weight: bold; }
-                        pre.diff { color: black; font-size: smaller; line-height: normal; }
-                    </style>
-                </head>
-                <body>
-                    <h1>Magento Project Mess Detector: Core Hacks Report</h1>';
-
-
 
             foreach ($table as &$row) {
                 $row['Type'] = '<a href="#'.$row['Type'].'">'.$row['Type'].'</a>';
             }
 
+            $htmlReport->addHeadline('Summary', 2);
 
-            $output .= '<h2>Overview</h2>';
-            $output .= $htmlTableRenderer->render($table, array('Type' , 'Count'));
+            unset($data[\Mpmd\Util\Compare::IDENTICAL_FILES]);
 
+            $htmlReport->addBody($htmlTableRenderer->render($table, array('Type' , 'Count')));
 
-            $output .= '<h3 id="'.\Mpmd\Util\Compare::FILE_MISSING_IN_A.'">Additional files in ' . $this->_magentoRootFolder . ':</h3>';
-            $output .= "<p>Since this would also include extra modules and themes this is currently skipped</p>";
-            // TODO: come up with a smart solution to only include some directories (e.g. app/code/core, the original designs and skins,...)
+            $htmlReport->addDiffData($data, $diffs, 'vanilla core', 'project');
 
-
-            $missingFiles = array();
-            foreach ($data[\Mpmd\Util\Compare::FILE_MISSING_IN_B] as $file) {
-                $missingFiles[] = array(
-                    'File' => $file
-                );
-            }
-            $output .= '<h3 id="'.\Mpmd\Util\Compare::FILE_MISSING_IN_B.'">Missing files in ' . $this->_magentoRootFolder . ':</h3>';
-            $output .= $htmlTableRenderer->render($missingFiles, array('File'));
-
-            $output .= '<h3 id="'.\Mpmd\Util\Compare::DIFFERENT_FILE_CONTENT.'">Changed files:</h3>';
-            $diffs = $compareUtil->getDiffs(
-                $data[\Mpmd\Util\Compare::DIFFERENT_FILE_CONTENT],
-                $pathToVanillaCore,
-                $this->_magentoRootFolder
-            );
-            $output .= $htmlTableRenderer->render($diffs, array('File', 'Diff'));
-
-            $output .= '<h3 id="'.\Mpmd\Util\Compare::SAME_FILE_BUT_COMMENTS.'">Changed files (comments only):</h3>';
-            $diffs = $compareUtil->getDiffs(
-                $data[\Mpmd\Util\Compare::SAME_FILE_BUT_COMMENTS],
-                $pathToVanillaCore,
-                $this->_magentoRootFolder
-            );
-            $output .= $htmlTableRenderer->render($diffs, array('File', 'Diff'));
-
-            $output .= '</body>';
-
-            file_put_contents($htmlReportOutputPath, $output);
+            file_put_contents($htmlReportOutputPath, $htmlReport->render());
             $this->_output->writeln("<info>Writing HTML report to: $htmlReportOutputPath</info>");
         }
 

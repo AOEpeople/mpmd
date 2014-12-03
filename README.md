@@ -8,7 +8,7 @@ Author: [Fabrizio Branca](http://fbrnc.net)
 
 ## Installation
 
-There are a few options. You can check out the different options in the [MageRundocs](http://magerun.net/introducting-the-new-n98-magerun-module-system/).
+There are a few options. You can check out the different options in the [MageRun docs](http://magerun.net/introducting-the-new-n98-magerun-module-system/).
 
 Here's the easiest:
 
@@ -20,7 +20,7 @@ mkdir -p ~/.n98-magerun/modules/
 ```
 git clone git@github.com:AOEpeople/mpmd.git ~/.n98-magerun/modules/mpmd
 ```
-3. It should be installed.To see that it was installed, check to see if one of the new commands is in there, like `diff:files`.
+3. It should be installed.To see that it was installed, check to see if one of the new commands is in there.
 ```
 n98-magerun mpmd:corehacks
 ```
@@ -61,3 +61,21 @@ Generating detailed HTML Report
 Report preview:
 
 ![Image](/docs/img/corehacks.jpg)
+
+### mpmd:codepooloverrides
+```
+Usage:
+ mpmd:codepooloverrides [--format[="..."]] [htmlReportOutputPath] [skipDirectories]
+
+Arguments:
+ htmlReportOutputPath  Path to where the HTML report will be written
+ skipDirectories       ':'-separated list of directories that will not be considered (defaults to '.svn:.git')
+```
+
+This command will compare all code pools with each other and detect files that are overriding each other.
+It will show identical files (What's the point of these? But yes, seen projects where this happened), copied files with changes in comments and whitespace only,
+and real changes. Of course with diff...
+ 
+Report preview:
+
+![Image](/docs/img/codepooloverride.jpg)
