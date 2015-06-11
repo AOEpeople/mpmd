@@ -32,10 +32,11 @@ class Compare
     public function compareDirectories($baseDirA, $baseDirB, $path='', $ignore=array())
     {
         $data = array(
-            self::DIFFERENT_FILE_CONTENT => array(),
-            self::IDENTICAL_FILES        => array(),
-            self::FILE_MISSING_IN_B      => array(),
-            self::SAME_FILE_BUT_COMMENTS => array(),
+            self::DIFFERENT_FILE_CONTENT   => array(),
+            self::IDENTICAL_FILES          => array(),
+            self::FILE_MISSING_IN_B        => array(),
+            self::SAME_FILE_BUT_COMMENTS   => array(),
+            self::SAME_FILE_BUT_WHITESPACE => array(),
         );
         if ($handle = opendir($baseDirA . $path)) {
             while ($file = readdir($handle)) {
@@ -83,9 +84,7 @@ class Compare
         $extension = strtolower(pathinfo($aFile, PATHINFO_EXTENSION));
         
         $additionalCheck = in_array($extension, array('php', 'phtml', 'xml'));
-        if ($additionalCheck
-            && ($this->getFileContentWithoutWhitespace($aFile) === $this->getFileContentWithoutWhitespace($bFile))
-        ) {
+        if ($this->getFileContentWithoutWhitespace($aFile) === $this->getFileContentWithoutWhitespace($bFile)) {
             return self::SAME_FILE_BUT_WHITESPACE;
         } elseif ($additionalCheck
             && ($this->getFileContentWithoutComments($aFile) === $this->getFileContentWithoutComments($bFile))
@@ -149,7 +148,9 @@ class Compare
     public function getFileContentWithoutWhitespace($path)
     {
         $fileStr = file_get_contents($path);
-        $fileStr = str_replace(array(" ","\t","\r","\n"), $fileStr);
+        $lines = explode("\n", $fileStr);
+        $lines = array_map('trim', $lines);
+        $fileStr = implode("\n", $lines);
         return $fileStr;
     }
 
