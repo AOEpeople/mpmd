@@ -2,7 +2,25 @@ autoloaders:
   Mpmd: %module%/src
 
 commands:
-   customCommands:
-       - Mpmd\Magento\CoreHacksCommand
-       - Mpmd\Magento\CodePoolOverridesCommand
-       - Mpmd\Magento\DependencyCheckCommand
+  customCommands:
+    - Mpmd\Magento\CoreHacksCommand
+    - Mpmd\Magento\CodePoolOverridesCommand
+    - Mpmd\Magento\DependencyCheckCommand
+    - Mpmd\Magento\DependencyCheckCommand\Verify
+    - Mpmd\Magento\DependencyCheckCommand\Classgraph
+    - Mpmd\Magento\DependencyCheckCommand\Modulegraph
+  Mpmd\Magento\DependencyCheckCommand:
+    parsers:
+      - Mpmd\DependencyChecker\Parser\Tokenizer
+      - Mpmd\DependencyChecker\Parser\Xpath
+    Mpmd\DependencyChecker\Parser\Tokenizer:
+      handlers:
+        - Mpmd\DependencyChecker\Parser\Tokenizer\Handler\WhitespaceString
+        - Mpmd\DependencyChecker\Parser\Tokenizer\Handler\Interfaces
+        - Mpmd\DependencyChecker\Parser\Tokenizer\Handler\TypeHints
+        - Mpmd\DependencyChecker\Parser\Tokenizer\Handler\StaticCalls
+        - Mpmd\DependencyChecker\Parser\Tokenizer\Handler\MagentoFactoryMethods
+    Mpmd\DependencyChecker\Parser\Xpath:
+      handlers:
+        - Mpmd\DependencyChecker\Parser\Xpath\Handler\SystemXml
+        - Mpmd\DependencyChecker\Parser\Xpath\Handler\LayoutXml

@@ -14,6 +14,9 @@ class TestClassA extends Mage_Catalog_Model_Product implements Mage_Adminhtml_Bl
     public function isHidden(){}
     public function setColumn($column){}
 
+    public function &getTransactionEvents(Mage_Core_AjaxController $controller) {
+    }
+
     public function checkTypeHints (Mage_Catalog_Model_Category $category, $noHint, Mage_Core_Helper_Data $data) {
         $new = new Mage_Admin_Model_Acl(); // done
         $lifetime = Mage_Core_Model_Cache::DEFAULT_LIFETIME; // done

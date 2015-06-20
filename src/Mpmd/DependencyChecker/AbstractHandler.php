@@ -22,10 +22,10 @@ abstract class AbstractHandler {
     {
         $this->parser = $parser;
         $this->collector = $collector;
-        $this->_contruct();
+        $this->_construct();
     }
 
-    public function _contruct() {}
+    public function _construct() {}
 
     abstract public function listenTo($type);
 

@@ -123,22 +123,143 @@ class Collector
     }
 
     /**
+     * Get class-to-class relations
+     *
+     * @return array
+     */
+    public function getClassRelations()
+    {
+        $relations = array();
+        foreach ($this->getSourceClasses() as $sourceClass => $data) {
+            $relations[$sourceClass] = array();
+            foreach ($data as $type => $classes) {
+                foreach ($classes as $targetClass) {
+                    if ($targetClass != $sourceClass) {
+                        if (!isset($relations[$sourceClass][$targetClass])) {
+                            $relations[$sourceClass][$targetClass] = array();
+                        }
+                        $relations[$sourceClass][$targetClass][] = $type;
+                    }
+                }
+            }
+        }
+        return $relations;
+    }
+
+    /**
+     * Get classes
+     *
+     * @return array
+     */
+    public function getModuleRelations()
+    {
+        $relations = array();
+        $divUtil = new \Mpmd\Util\Div();
+        foreach ($this->getSourceClasses() as $sourceClass => $data) {
+            $sourceModule = $divUtil->getModuleFromClass($sourceClass, 2);
+            if (!is_array($relations[$sourceModule])) {
+                $relations[$sourceModule] = array();
+            }
+            foreach ($data as $type => $classes) {
+                foreach ($classes as $targetClass) {
+                    $targetModule = $divUtil->getModuleFromClass($targetClass, 2);
+                    if ($targetModule != $sourceModule) {
+                        if (!is_array($relations[$sourceModule])) {
+                            $relations[$sourceModule] = array();
+                        }
+                        if (!in_array($targetModule, $relations[$sourceModule])) {
+                            $relations[$sourceModule][] = $targetModule;
+                        }
+                    }
+                }
+            }
+        }
+        return $relations;
+    }
+
+    /**
+     * Returns the class for a given file (if any)
+     *
+     * @param $file
+     * @return bool|string
+     */
+    public function getClassForFile($file)
+    {
+        if (!isset($this->classes[$file])) {
+            throw new \InvalidArgumentException('File not found.');
+        }
+        if (!is_array($this->classes[$file]['class']) || count($this->classes[$file]['class']) == 0) {
+            return false;
+        }
+        if (count($this->classes[$file]['class']) > 1) {
+            // TODO: found more than one class in this file! ignoring this for now...
+        }
+        return reset($this->classes[$file]['class']);
+    }
+
+    /**
      * Get classes
      *
      * @return array
      */
     public function getModules()
     {
+        return array_keys($this->getClassesByModule());
+    }
+
+    /**
+     * Get classes grouped by module
+     *
+     * @return array
+     */
+    public function getClassesByModule()
+    {
         $divUtil = new \Mpmd\Util\Div();
 
-        $modules = array();
+        $classesByModule = array();
         foreach ($this->flatten() as $class) {
             $module = $divUtil->getModuleFromClass($class, 2);
-            if (!in_array($module, $modules)) {
-                $modules[] = $module;
+            if (!in_array($module, $classesByModule)) {
+                $classesByModule[$module][] = $class;
             }
         }
-        return $modules;
+        return $classesByModule;
+    }
+
+    /**
+     * Get all classes found in the files (not in the depencencies)
+     *
+     * @return array
+     */
+    public function getSourceClasses()
+    {
+        $sourceClasses = array();
+        foreach ($this->classes as $file => $data) {
+            $sourceClass = $this->getClassForFile($file);
+            if (!$sourceClass) {
+                continue;
+            }
+            $sourceClasses[$sourceClass] = $data;
+        }
+        return $sourceClasses;
+    }
+
+    /**
+     * Get all modules found in source classes
+     *
+     * @return array
+     */
+    public function getSourceModules()
+    {
+        $divUtil = new \Mpmd\Util\Div();
+        $sourceModules = array();
+        foreach ($this->getSourceClasses() as $sourceClass => $data) {
+            $sourceModule = $divUtil->getModuleFromClass($class, 2);
+            if (!in_array($sourceModule, $sourceModules)) {
+                $sourceModules[] = $sourceModule;
+            }
+        }
+        return $sourceModules;
     }
 
     /**

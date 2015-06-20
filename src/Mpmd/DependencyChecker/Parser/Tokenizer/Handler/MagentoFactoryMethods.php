@@ -36,7 +36,11 @@ class MagentoFactoryMethods extends AbstractHandler {
             if ($string == strtolower($method)) {
                 $j = $this->parser->skip($i+1, array(T_WHITESPACE));
                 $this->parser->assertToken($j, '(');
-                $j = $this->parser->skip($j+1, array(T_WHITESPACE));
+                $j = $this->parser->skip($j+1, array(T_WHITESPACE, T_STRING_CAST));
+                if ($this->parser->is($j, T_VARIABLE)) {
+                    // we can't find out what that variable points to, so we'll let this one go...
+                    continue;
+                }
                 $this->parser->assertToken($j, T_CONSTANT_ENCAPSED_STRING);
 
                 $classPath = trim($this->parser->getValue($j), '"\'');

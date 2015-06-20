@@ -15,7 +15,7 @@ class StaticCalls extends AbstractHandler {
         $this->parser->assertToken($i-1, T_STRING);
         $value = $this->parser->getValue($i-1);
         if (!in_array($value, array('self', 'parent'))) {
-            $this->collector->addClass($value, 'static_calls');
+            $this->collector->addClass($value, 'static_call');
         }
     }
 

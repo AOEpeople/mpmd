@@ -28,7 +28,6 @@ class WhitespaceString extends AbstractHandler {
                 // we can't handle code like this:
                 // $object = new $className();
                 // so, let's just skip that.
-
             } else {
                 throw $e;
             }

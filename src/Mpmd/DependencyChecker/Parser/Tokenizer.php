@@ -21,30 +21,13 @@ class Tokenizer extends AbstractParser
     protected $tokens;
 
     /**
-     * Constructor
-     *
-     * @param \Mpmd\DependencyChecker\Collector $collector
-     */
-    public function __construct(\Mpmd\DependencyChecker\Collector $collector)
-    {
-        // TODO: there are probably better ways of doing this
-
-        $this->addHandler(new Tokenizer\Handler\WhitespaceString($this, $collector));
-        $this->addHandler(new Tokenizer\Handler\Interfaces($this, $collector));
-        $this->addHandler(new Tokenizer\Handler\TypeHints($this, $collector));
-        $this->addHandler(new Tokenizer\Handler\StaticCalls($this, $collector));
-        $this->addHandler(new Tokenizer\Handler\MagentoFactoryMethods($this, $collector));
-    }
-
-    /**
      * Run tokenizer
      *
      * @param string filename
      * @throws \Exception
      */
-    public function parse($file)
+    public function parse($source)
     {
-        $source = file_get_contents($file);
         $this->tokens = token_get_all($source);
 
         foreach ($this->tokens as $i => $token) {
