@@ -1,10 +1,25 @@
 # Magento Project Mess Detector
 
+Author: [Fabrizio Branca](http://fbrnc.net)
+
 Some additional commands for the excellent n98-magerun Magento command-line tool that will help you to find out how messed up a Magento instance is :)
 
-So far there's only one single command (`mpmd:corehacks`), but more commands are planned to allow generating reports for code pool overwrites, themes, and some more checks.
+## Table of Contents
 
-Author: [Fabrizio Branca](http://fbrnc.net)
+* [`mpmd:corehacks`](#command-mpmdcorehacks)
+* [`mpmd:corehacks`](#command-mpmdcodepooloverrides)
+* [Dependency Checker](#dependency-checker)
+	* [How does it work?](#how-does-it-work)
+	* [Why?](#why)
+	* [Parsers](#parsers)
+	* [Handlers](#handlers)
+	* [Specifying sources](#specifying-sources)
+	* Commands
+		* [`mpmd:dependencychecker`](#command-mpmddependencychecker)
+		* [`mpmd:dependencychecker:verify`](#command-mpmddependencycheckerverify)
+		* [`mpmd:dependencychecker:graph:module`](#command-mpmddependencycheckergraphmodule)
+		* [`mpmd:dependencychecker:graph:class`](#command-mpmddependencycheckergraphclass)
+
 
 ## Installation
 
@@ -63,7 +78,7 @@ Report preview:
 
 ![Image](/docs/img/corehacks.jpg)
 
-### Command: `mpmd:codepooloverrides`
+### Command: `mpmd:corehacks`
 ```
 Usage:
  mpmd:codepooloverrides [--format[="..."]] [htmlReportOutputPath] [skipDirectories]
