@@ -224,7 +224,7 @@ n98-magerun.phar mpmd:dependencycheck:graph:module app/code/core/Mage/* | dot -T
 ```
 Here's a tiny(!) crop of the graph generated in this example (click the image for a full-sized svg). Sadly there are a ton of dependencies in the Magento core (and most likely also in your modules) so these graphs can quickly grow pretty huge: 
 
-[![Image](/docs/img/mage_modulegraph.png)](/doc/img/mage_modulegraph.svg)
+[![Image](/docs/img/mage_modulegraph.png)](/docs/img/mage_modulegraph.svg)
 
 ### Command: `mpmd:dependencychecker:graph:class`
 
