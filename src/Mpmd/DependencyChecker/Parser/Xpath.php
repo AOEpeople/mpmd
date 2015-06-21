@@ -17,6 +17,10 @@ class Xpath extends AbstractParser
 
     public function parse($string)
     {
+        if (count($this->handlers) == 0) {
+            throw new \Exception('No handlers found');
+        }
+
         $simpleXml = simplexml_load_string($string);
 
         foreach ($this->handlers as $handler) { /* @var $handler Xpath\Handler\AbstractHandler */

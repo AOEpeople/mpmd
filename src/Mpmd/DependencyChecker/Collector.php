@@ -25,6 +25,11 @@ class Collector
         $this->currentFile = $currentFile;
     }
 
+    public function getCurrentFile()
+    {
+        return $this->currentFile;
+    }
+
     /**
      * Add a class that was found
      *
@@ -164,11 +169,13 @@ class Collector
                 foreach ($classes as $targetClass) {
                     $targetModule = $divUtil->getModuleFromClass($targetClass, 2);
                     if ($targetModule != $sourceModule) {
-                        if (!is_array($relations[$sourceModule])) {
-                            $relations[$sourceModule] = array();
-                        }
-                        if (!in_array($targetModule, $relations[$sourceModule])) {
-                            $relations[$sourceModule][] = $targetModule;
+                        if (strpos($targetModule, ' ') === false) { // some "modules" say "[Could not resolve: ...]"
+                            if (!is_array($relations[$sourceModule])) {
+                                $relations[$sourceModule] = array();
+                            }
+                            if (!in_array($targetModule, $relations[$sourceModule])) {
+                                $relations[$sourceModule][] = $targetModule;
+                            }
                         }
                     }
                 }

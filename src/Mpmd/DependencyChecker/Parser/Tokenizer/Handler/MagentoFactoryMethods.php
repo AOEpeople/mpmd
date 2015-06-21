@@ -10,13 +10,39 @@ class MagentoFactoryMethods extends AbstractHandler {
 
     protected $types = array(T_STRING);
 
-    protected $factoryMethods = array();
+    protected $factory;
 
-    public function _construct()
+    /**
+     * Set Magento factory
+     *
+     * Poor-man's dependency injections :)
+     * This gives us a chance to inject a factory mock right after instantiating this class before
+     * the lazy-loading getMagentoFactory() would create a regular one.
+     *
+     * @param \Mpmd\Util\MagentoFactory $factory
+     */
+    public function setMagentoFactory(\Mpmd\Util\MagentoFactory $factory)
     {
-        $magentoFactoryUtil = new \Mpmd\Util\MagentoFactory();
+        $this->factory = $factory;
+    }
 
-        $this->factoryMethods = array(
+    /**
+     * Get Magento factory
+     *
+     * @return \Mpmd\Util\MagentoFactory
+     */
+    public function getMagentoFactory()
+    {
+        if (is_null($this->factory)) {
+            $this->factory = new \Mpmd\Util\MagentoFactory();
+        }
+        return $this->factory;
+    }
+
+    public function getFactoryMethodNames()
+    {
+        $magentoFactoryUtil = $this->getMagentoFactory();
+        return array(
             'getModel' => array($magentoFactoryUtil, 'getModelClassName'),
             'getSingleton' => array($magentoFactoryUtil, 'getModelClassName'),
             'getResourceModel' => array($magentoFactoryUtil, 'getResourceModelClassName'),
@@ -32,24 +58,19 @@ class MagentoFactoryMethods extends AbstractHandler {
     public function handle($i)
     {
         $string = strtolower($this->parser->getValue($i));
-        foreach ($this->factoryMethods as $method => $converter) {
+        foreach ($this->getFactoryMethodNames() as $method => $converter) {
             if ($string == strtolower($method)) {
                 $j = $this->parser->skip($i+1, array(T_WHITESPACE));
                 $this->parser->assertToken($j, '(');
-                $j = $this->parser->skip($j+1, array(T_WHITESPACE, T_STRING_CAST));
-                if ($this->parser->is($j, T_VARIABLE)) {
-                    // we can't find out what that variable points to, so we'll let this one go...
-                    continue;
+                $j = $this->parser->skip($j+1, array(T_WHITESPACE));
+                if ($this->parser->is($j, T_CONSTANT_ENCAPSED_STRING)) { // we can't detecte what's in variables so we focus on strings here
+                    $classPath = trim($this->parser->getValue($j), '"\'');
+                    $class = call_user_func($converter, $classPath);
+                    if (!$class) {
+                        $class = '[Could not resolve: '.$classPath.']';
+                    }
+                    $this->collector->addClass($class, $method);
                 }
-                $this->parser->assertToken($j, T_CONSTANT_ENCAPSED_STRING);
-
-                $classPath = trim($this->parser->getValue($j), '"\'');
-                $class = call_user_func($converter, $classPath);
-
-                if (!$class) {
-                    $class = '[Could not resolve: '.$classPath.']';
-                }
-                $this->collector->addClass($class, $method);
             }
         }
     }

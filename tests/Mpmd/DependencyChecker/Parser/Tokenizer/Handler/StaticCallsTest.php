@@ -6,10 +6,12 @@ class StaticCallsTest extends \HandlerTestCase {
 
     protected $handlerClass = '\Mpmd\DependencyChecker\Parser\Tokenizer\Handler\StaticCalls';
 
+    protected $parserClass = '\Mpmd\DependencyChecker\Parser\Tokenizer';
+
     public function testNoInterfaces() {
         $this->collectorMock->expects($this->never())
             ->method('addClass');
-        $this->tokenizer->parse('<?php class A {}');
+        $this->parser->parse('<?php class A {}');
     }
 
     public function testStaticClassConstant() {
@@ -20,7 +22,7 @@ class StaticCallsTest extends \HandlerTestCase {
                 $this->equalTo('static_call')
             );
 
-        $this->tokenizer->parse('<?php echo B::CLASS_CONSTANT;');
+        $this->parser->parse('<?php echo B::CLASS_CONSTANT;');
     }
 
     public function testStaticClassFunctionCall() {
@@ -31,14 +33,14 @@ class StaticCallsTest extends \HandlerTestCase {
                 $this->equalTo('static_call')
             );
 
-        $this->tokenizer->parse('<?php echo B::functionCall();');
+        $this->parser->parse('<?php echo B::functionCall();');
     }
 
     public function testIgnoreSelf() {
         $this->collectorMock->expects($this->never())
             ->method('addClass');
 
-        $this->tokenizer->parse('<?php class A {
+        $this->parser->parse('<?php class A {
             public static function foo() {};
             public static function bar() {
                 self::foo();
@@ -50,7 +52,7 @@ class StaticCallsTest extends \HandlerTestCase {
         $this->collectorMock->expects($this->never())
             ->method('addClass');
 
-        $this->tokenizer->parse('<?php class A {
+        $this->parser->parse('<?php class A {
             public static function foo() {};
             public static function bar() {
                 parent::foo();

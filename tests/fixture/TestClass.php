@@ -18,6 +18,7 @@ class TestClassA extends Mage_Catalog_Model_Product implements Mage_Adminhtml_Bl
     }
 
     public function checkTypeHints (Mage_Catalog_Model_Category $category, $noHint, Mage_Core_Helper_Data $data) {
+        $job = Mage::getModel("monkey/bulksync{$entity}")->load($id);
         $new = new Mage_Admin_Model_Acl(); // done
         $lifetime = Mage_Core_Model_Cache::DEFAULT_LIFETIME; // done
         $model = Mage::getModel('customer/customer');

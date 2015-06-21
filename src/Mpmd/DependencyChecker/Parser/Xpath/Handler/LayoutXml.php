@@ -14,8 +14,6 @@ class LayoutXml extends AbstractHandler {
             throw new \InvalidArgumentException("Expected a SimpleXMLElement");
         }
 
-        $magentoFactoryUtil = new \Mpmd\Util\MagentoFactory();
-
         foreach ($xml->xpath('//block') as $blockXml) { /* @var $blockXml \SimpleXMLElement */
             $blockClassPath = (string)$blockXml['type'];
             if (empty($blockClassPath)) {
@@ -23,7 +21,7 @@ class LayoutXml extends AbstractHandler {
                 // TODO: this shouldn't happen. And maybe another tool could check this
                 // throw new \Exception('No type found');
             }
-            $class = $magentoFactoryUtil->getBlockClassName($blockClassPath);
+            $class = $this->getMagentoFactory()->getBlockClassName($blockClassPath);
             $this->collector->addClass($class, 'block');
         }
     }

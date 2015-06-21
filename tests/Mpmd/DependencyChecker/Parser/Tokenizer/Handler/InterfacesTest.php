@@ -6,6 +6,8 @@ class InterfacesTest extends \HandlerTestCase {
 
     protected $handlerClass = '\Mpmd\DependencyChecker\Parser\Tokenizer\Handler\Interfaces';
 
+    protected $parserClass = '\Mpmd\DependencyChecker\Parser\Tokenizer';
+
     public function testSingleInterface() {
         $this->collectorMock->expects($this->once())
             ->method('addClass')
@@ -14,7 +16,7 @@ class InterfacesTest extends \HandlerTestCase {
                 $this->equalTo('implements')
             );
 
-        $this->tokenizer->parse('<?php class A implements B {}');
+        $this->parser->parse('<?php class A implements B {}');
     }
 
     public function testMultipleInterfaces() {
@@ -25,13 +27,13 @@ class InterfacesTest extends \HandlerTestCase {
                 array($this->equalTo('C'), $this->equalTo('implements'))
             );
 
-        $this->tokenizer->parse('<?php class A implements B, C {}');
+        $this->parser->parse('<?php class A implements B, C {}');
     }
 
     public function testNoInterfaces() {
         $this->collectorMock->expects($this->never())
             ->method('addClass');
-        $this->tokenizer->parse('<?php class A {}');
+        $this->parser->parse('<?php class A {}');
     }
 
     public function testSingleInterfaceWithLinebreak() {
@@ -42,7 +44,7 @@ class InterfacesTest extends \HandlerTestCase {
                 $this->equalTo('implements')
             );
 
-        $this->tokenizer->parse('<?php class A
+        $this->parser->parse('<?php class A
         implements B {}');
     }
 
@@ -54,7 +56,7 @@ class InterfacesTest extends \HandlerTestCase {
                 array($this->equalTo('C'), $this->equalTo('implements'))
             );
 
-        $this->tokenizer->parse('<?php class A
+        $this->parser->parse('<?php class A
         implements B,
         C {}');
     }

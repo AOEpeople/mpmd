@@ -208,7 +208,7 @@ class DependencyCheckCommand extends \N98\Magento\Command\AbstractMagentoCommand
 
             // instantiate the parsers
             $parser = new $parserClass();
-            if (!$parser instanceof \Mpmd\DependencyChecker\Parser\AbstractParser) {
+            if (!$parser instanceof \Mpmd\DependencyChecker\Parser\ParserInterface) {
                 throw new \Exception('Invalid parser class');
             }
 
@@ -216,7 +216,7 @@ class DependencyCheckCommand extends \N98\Magento\Command\AbstractMagentoCommand
             if (isset($commandConfig[$parserClass]) && isset($commandConfig[$parserClass]['handlers'])) {
                 foreach ($commandConfig[$parserClass]['handlers'] as $handlerClass) {
                     $handler = new $handlerClass($parser, $collector);
-                    if (!$handler instanceof \Mpmd\DependencyChecker\AbstractHandler) {
+                    if (!$handler instanceof \Mpmd\DependencyChecker\HandlerInterface) {
                         throw new \Exception('Invalid handler class');
                     }
                     $parser->addHandler($handler);

@@ -10,7 +10,7 @@ namespace Mpmd\DependencyChecker\Parser;
  * @author Fabrizio Branca
  * @since 2015-06-19
  */
-abstract class AbstractParser {
+abstract class AbstractParser implements ParserInterface {
 
     /**
      * @var array
@@ -37,9 +37,9 @@ abstract class AbstractParser {
     /**
      * Add a handler
      *
-     * @param Tokenizer\Handler\AbstractHandler $handler
+     * @param \Mpmd\DependencyChecker\AbstractHandler $handler
      */
-    public function addHandler(Tokenizer\Handler\AbstractHandler $handler) {
+    public function addHandler(\Mpmd\DependencyChecker\AbstractHandler $handler) {
         $this->handlers[] = $handler;
     }
 

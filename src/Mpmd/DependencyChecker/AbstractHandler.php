@@ -6,7 +6,7 @@ namespace Mpmd\DependencyChecker;
  * @author Fabrizio Branca
  * @since 2015-06-19
  */
-abstract class AbstractHandler {
+abstract class AbstractHandler implements HandlerInterface {
 
     /**
      * @var \Mpmd\DependencyChecker\Parser\AbstractParser

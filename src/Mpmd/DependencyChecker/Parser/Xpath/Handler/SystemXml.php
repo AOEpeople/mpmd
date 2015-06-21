@@ -15,8 +15,6 @@ class SystemXml extends AbstractHandler
             throw new \InvalidArgumentException("Expected a SimpleXMLElement");
         }
 
-        $magentoFactoryUtil = new \Mpmd\Util\MagentoFactory();
-
         $nodes = array(
             'frontend_model',
             'backend_model',
@@ -26,7 +24,7 @@ class SystemXml extends AbstractHandler
         foreach ($nodes as $node) {
             foreach ($xml->xpath('//'.$node) as $modelXml) { /* @var $model \SimpleXMLElement */
                 $modelClassPath = (string)$modelXml;
-                $class = $magentoFactoryUtil->getModelClassName($modelClassPath);
+                $class = $this->getMagentoFactory()->getModelClassName($modelClassPath);
                 $this->collector->addClass($class, $node);
             }
         }

@@ -28,6 +28,10 @@ class Tokenizer extends AbstractParser
      */
     public function parse($source)
     {
+        if (count($this->handlers) == 0) {
+            throw new \Exception('No handlers found');
+        }
+
         $this->tokens = token_get_all($source);
 
         foreach ($this->tokens as $i => $token) {
