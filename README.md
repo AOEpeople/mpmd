@@ -27,7 +27,7 @@ n98-magerun mpmd:corehacks
 
 ## Commands
 
-### mpmd:corehacks
+### Command `mpmd:corehacks`
 ```
 Usage:
  mpmd:corehacks [--format[="..."]] pathToVanillaCore [htmlReportOutputPath] [skipDirectories]
@@ -63,7 +63,7 @@ Report preview:
 
 ![Image](/docs/img/corehacks.jpg)
 
-### mpmd:codepooloverrides
+### Command: `mpmd:codepooloverrides`
 ```
 Usage:
  mpmd:codepooloverrides [--format[="..."]] [htmlReportOutputPath] [skipDirectories]
@@ -129,20 +129,26 @@ All parsers need to implement `Mpmd\DependencyChecker\Parser\ParserInterface`
 
 ### Handlers
 
-Every parser comes with a number of handlers. Here's the list of handler that come with the dependency checker:
+Every parser comes with a number of handlers. Here's the list of default handlers that come with the dependency checker:
 
 | Parser    | Handler               | Will process                     | What it does                                                                                         |
 |-----------|-----------------------|----------------------------------|------------------------------------------------------------------------------------------------------|
 | Tokenizer | Interfaces            | `T_IMPLEMENTS`                   | Finds interfaces: `class A implements B {}`                                                          |
 | Tokenizer | WhitespaceString      | `T_NEW`, `T_EXTENDS`, `T_CLASS`  | Finds creating classes with new: `$a = new B();`<br />Finds extended classes: `class A extends B {}` |
-| Tokenizer | StaticCalls           | `T_DOUBLE_COLON`                 | Finds static calls: `A::B` and A::B()`                                                               |
+| Tokenizer | StaticCalls           | `T_DOUBLE_COLON`                 | Finds static calls: `A::B` and `A::B()`                                                               |
 | Tokenizer | TypeHints             | `T_FUNCTION`                     | Finds type hints: `function a (B $b) {}`                                                             |
-| Tokenizer | MagentoFactoryMethods | `T_STRING` for specific keywords |                                                                                                      |
-|           |                       |                                  |                                                                                                      |
-|           |                       |                                  |                                                                                                      |
+| Tokenizer | MagentoFactoryMethods | `T_STRING` for specific keywords | Finds classes instantiated with one of Magento's factory methods and resolves them to real PHP classes not taking rewrites into account:<br />`Mage::getModel()`<br />`Mage::getSingleton()`<br />`Mage::getResourceModel()`<br />`Mage::getResourceSingleton()`<br />`$this->getLayout()->createBlock()`<br />`Mage::getBlockSingleton()`<br />`Mage::helper()`<br />`Mage::getResourceHelper()`<br />`Mage::getControllerInstance()`<br />                                                                                                  |
+| Xpath     | LayoutXml             | All xml files                    | Finds blocks and resolves the into real PHP classes: `<block type="core/text">`                      |
+| Xpath     | SystemXml             | All xml files                    | Finds references to models in system.xml files:<br />`<frontend_model>adminhtml/system_config_form_field_notification</frontend_model>`<br />`<source_model>adminhtml/system_config_source_yesno</source_model>`<br />`<backend_model>adminhtml/system_config_backend_store</backend_model>`                                                                                                     |
+
+**Note:** `MagentoFactoryMethods`, `LayoutXml` and `SystemXml` need to resolve Magento classpaths into real PHP classes. The challenge hereby is NOT to take rewrites into account since rewriting a class is a mechanism that was introduced to ALLOW decoupling without dependending on each other. In order to leverage Magento and it's configuration to resolve the class paths but not take the rewrite into accounts 
+- the module that we're testing needs to be installed into a functioning Magento environment and all dependencies must be fulfilled
+- we need to "trick" something into being `Mage_Core_Model_Config` having access to the same data but doing things slightly differently. `Mpmd\Util\MagentoFactory` takes care of that and provides access to some of the original functions like `getModelClassName()` and `getBlockClassName()`...
 
 
-Examples:
+### Specifying sources
+
+Every command (and sub-commands) of the dependency checker require you to specify what you want to analyze. This can be one or more files or directories. And glob patterns are also supported. Here are some examples:
 
 ```
 # Single file:
@@ -162,5 +168,87 @@ n98-magerun.phar mpmd:dependencycheck -m app/code/*/*/*/
 # Multiple locations 
 n98-magerun.phar mpmd:dependencycheck -m app/code/local/My/Module/ app/code/community/My/OtherModule/ app/design/frontend/mypackage
 ```
-Note: Please specify absolute paths or paths relative to your Magento root directory (not relative to the current directory, which might be different if n98-magerun detected Magento in a different directory (e.g. htdocs/) or you're using `--root-dir=...` to tell n98-magerun where to find your Magento root)
+**Note:** Please specify absolute paths or paths relative to your Magento root directory (not relative to the current directory, which might be different if n98-magerun detected Magento in a different directory (e.g. htdocs/) or you're using `--root-dir=...` to tell n98-magerun where to find your Magento root)
 
+### Command: `mpmd:dependencychecker`
+
+This is the main command that gives you access to following options (specify one or more):
+
+| Option        | Short option | What it does                                                                                                                 |
+|---------------|--------------|------------------------------------------------------------------------------------------------------------------------------|
+| `--modules`   | `-m`         | This shows you all modules that were detected in the specified sources and the modules that this code depends on.            |
+| `--libraries` | `-l`         | This shows you all the libraries (`lib/*`) that the specified sources depend on                                              |
+| `--classes`   | `-c`         | This detects all the classes in the specified sources (where available) and shows what other classes they are using and how. |
+| `--details`   | `-d`         | This shows all the details (verbose!)                                                                                        |
+
+### Command: `mpmd:dependencychecker:verify`
+
+This command compares the actual dependencies found in the code with the ones declared for a given module (specify with `-m <Module_Name>`)
+
+Example:
+
+```
+n98-magerun.phar mpmd:dependencycheck:verify -m Mage_Catalog app/code/core/Mage/Catalog
+
++---------------------+---------------------------------------------+--------------+
+| Declared Dependency | Actual Dependency                           | Status       |
++---------------------+---------------------------------------------+--------------+
+| Mage_Cms            | Mage_Cms                                    | OK           |
+| Mage_Dataflow       | Mage_Dataflow                               | OK           |
+| Mage_Eav            | Mage_Eav                                    | OK           |
+| Mage_Index          | Mage_Index                                  | OK           |
+| -                   | Mage_Adminhtml                              |  Undeclared  |
+| -                   | Mage_Api2                                   |  Undeclared  |
+| -                   | Mage_Api                                    |  Undeclared  |
+| -                   | Mage_Bundle                                 |  Undeclared  |
+| -                   | Mage_CatalogIndex                           |  Undeclared  |
+...
+```
+
+In this example you can see how `Mage_Catalog` only declares dependencies to `Mage_Cms`, `Mage_Dataflow`, `Mage_Eav` and `Mage_Index`. But in reality `Mage_Catalog` depends on many more modules...
+
+**Note:** Since pointing to the directory in app/code/ will not take the layout and template files into account that might belong to a module and will also introduce dependencies it is recommended to always include all relevant directories to the `source` parameter, or - in case you're using modman and everything lives in a separate directory anyway point this command to that directory instead;
+
+```
+n98-magerun.phar mpmd:dependencycheck:verify -m My_Module ../.modman/My_Module
+```
+
+
+### Command: `mpmd:dependencychecker:graph:module`
+
+This command will render a dependency graph for the relevant modules as a `dot` file. Use the Graphviz tool (Ubuntu: `sudo apt-get install graphviz`) to create a svg (or many other formats):
+
+Example:
+```
+n98-magerun.phar mpmd:dependencycheck:graph:module app/code/core/Mage/* | dot -Tsvg -o mage.svg
+```
+Here's a tiny(!) crop of the graph generated in this example (click the image for a full-sized svg). Sadly there are a ton of dependencies in the Magento core (and most likely also in your modules) so these graphs can quickly grow pretty huge: 
+
+[![Image](/docs/img/mage_modulegraph.png)](/doc/img/mage_modulegraph.svg)
+
+### Command: `mpmd:dependencychecker:graph:class`
+
+While the previous command shows you a higher level view on modules only, `mpmd:dependencychecker:graph:class` will drill down into individual classes and optionally group them by module. Consider this graph "zooming in" into the modules in order to find out what classes are responsible for the dependency.
+
+The graph shows different line types:
+
+| Style  | Type                           |
+|--------|--------------------------------|
+| Solid  | **Inheritance:** extends, implements            |
+| Dashed | **Composition**: new, type_hints, get*, blocks, source/backend/frontend_model |
+| Dotted | everything else (static calls) |
+
+(This might require some better categorization (e.g. implements != inheritance, type hint != composition)
+
+Example: 
+```
+# ungrouped
+n98-magerun.phar mpmd:dependencycheck:graph:class app/code/core/Mage/Captcha | dot -Tpng -o Mage_Captcha.png
+
+# grouped
+n98-magerun.phar mpmd:dependencycheck:graph:class --group app/code/core/Mage/Captcha | dot -Tpng -o Mage_Captcha.png
+```
+
+| Ungrouped  | Grouped |
+|--------|--------------------------------|
+| [![Image](/docs/img/Mage_Captcha.png)](/docs/img/Mage_Captcha.svg)  | [![Image](/docs/img/Mage_Captcha_grouped.png)](/docs/img/Mage_Captcha_grouped.svg) |

@@ -22,11 +22,11 @@ class Classgraph extends \Mpmd\Magento\DependencyCheckCommand
     protected function configure()
     {
         $this
-            ->setName('mpmd:dependencycheck:classgraph')
+            ->setName('mpmd:dependencycheck:graph:class')
             ->addArgument('source', InputArgument::IS_ARRAY, 'File or directory to analyze')
-            ->addOption('libraries', 'l', InputOption::VALUE_OPTIONAL, 'Include libraries')
-            ->addOption('group', 'g', InputOption::VALUE_OPTIONAL, 'Group classes by module')
-            ->setDescription('Creates a classgraph')
+            ->addOption('libraries', 'l', InputOption::VALUE_NONE, 'Include libraries')
+            ->addOption('group', 'g', InputOption::VALUE_NONE, 'Group classes by module')
+            ->setDescription('Creates a class graph')
         ;
     }
 
@@ -69,21 +69,23 @@ class Classgraph extends \Mpmd\Magento\DependencyCheckCommand
         $output[] = 'digraph callgraph {';
         $output[] = '';
         $output[] = '    rankdir=LR;';
-        $output[] = '    edge[arrowhead=vee, arrowtail=inv, arrowsize=.7, color=darkgrey];';
-        $output[] = '    node [fontname="verdana", shape=plaintext, style="filled", fillcolor=darkgrey];';
+        $output[] = '    edge[arrowhead=vee, arrowtail=inv, arrowsize=.7, color="#dddddd"];';
+        $output[] = '    node [fontname="verdana", shape=plaintext, style="filled", fillcolor="#dddddd"];';
         $output[] = '    fontname="Verdana";';
         $output[] = '';
 
-        foreach ($collector->getClassesByModule() as $module => $classes) {
-            $output[] = "    subgraph cluster_$module {";
-            $output[] = "        style=filled;";
-            $output[] = "        color=\"#eeeeee\";";
-            $output[] = "        label=\"$module\";";
-            foreach ($classes as $class) {
-                $output[] = "        node [label=\"$class\"] $class;";
+        if ($this->_input->getOption('group')) {
+            foreach ($collector->getClassesByModule() as $module => $classes) {
+                $output[] = "    subgraph cluster_$module {";
+                $output[] = "        style=filled;";
+                $output[] = "        color=\"#eeeeee\";";
+                $output[] = "        label=\"$module\";";
+                foreach ($classes as $class) {
+                    $output[] = "        node [label=\"$class\"] $class;";
+                }
+                $output[] = "    }";
+                $output[] = '';
             }
-            $output[] = "    }";
-            $output[] = '';
         }
 
         foreach ($relations as $sourceClass => $targetClasses) {
@@ -97,15 +99,19 @@ class Classgraph extends \Mpmd\Magento\DependencyCheckCommand
         echo implode("\n", $output) . "\n";
     }
 
-    protected function getEdgeStyleForType($types) {
+    protected function getEdgeStyleForType($types)
+    {
+
         $boldOnes = array('extends', 'implements');
         if (count(array_intersect($boldOnes, $types))) {
             return 'bold';
         }
-        $dashedOnes = array('new', 'type_hints');
+
+        $dashedOnes = array('new', 'type_hints', 'block', 'frontend_model', 'backend_model', 'source_model');
         if (count(array_intersect($boldOnes, $types))) {
             return 'dashed';
         }
+
         foreach ($types as $type) {
             if (strpos($type, 'get') === 0) {
                 return 'dashed';

@@ -22,7 +22,7 @@ class Modulegraph extends \Mpmd\Magento\DependencyCheckCommand
     protected function configure()
     {
         $this
-            ->setName('mpmd:dependencycheck:modulegraph')
+            ->setName('mpmd:dependencycheck:graph:module')
             ->addArgument('source', InputArgument::IS_ARRAY, 'File or directory to analyze')
             ->setDescription('Creates a module graph')
         ;
@@ -62,8 +62,8 @@ class Modulegraph extends \Mpmd\Magento\DependencyCheckCommand
         $output[] = 'digraph callgraph {';
         $output[] = '';
         $output[] = '    rankdir=LR;';
-        $output[] = '    edge[arrowhead=vee, arrowtail=inv, arrowsize=.7, color=darkgrey];';
-        $output[] = '    node [fontname="verdana", shape=plaintext, style="filled", fillcolor=darkgrey];';
+        $output[] = '    edge[arrowhead=vee, arrowtail=inv, arrowsize=.7, color="#dddddd"];';
+        $output[] = '    node [fontname="verdana", shape=plaintext, style="filled", fillcolor="#dddddd"];';
         $output[] = '    fontname="Verdana";';
         $output[] = '';
 

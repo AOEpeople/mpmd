@@ -85,4 +85,17 @@ class TypeHintsTest extends \HandlerTestCase {
         $this->parser->parse('<?php class A { public function &A(B $b) {} }');
     }
 
+    public function testReferenceParameters() {
+
+        $this->collectorMock->expects($this->once())
+            ->method('addClass')
+            ->with(
+                $this->equalTo('SimpleXMLElement'),
+                $this->equalTo('type_hint')
+            );
+
+        $this->parser->parse('<?php class A {private function _assocToXml(array $array, $rootName, SimpleXMLElement &$xml) {}}');
+
+    }
+
 }

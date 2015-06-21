@@ -33,7 +33,6 @@ class DependencyCheckCommand extends \N98\Magento\Command\AbstractMagentoCommand
             ->addOption('libraries', 'l', InputOption::VALUE_NONE, 'Show depenent libraries')
             ->addOption('classes', 'c', InputOption::VALUE_NONE, 'Show relationships between classes')
             ->addOption('details', 'd', InputOption::VALUE_NONE, 'Show all details (very verbose!)')
-            ->addOption('template', 't', InputOption::VALUE_OPTIONAL, 'Output template')
             ->setDescription('Find dependencies')
             ->addOption(
                 'format',
@@ -90,6 +89,9 @@ class DependencyCheckCommand extends \N98\Magento\Command\AbstractMagentoCommand
                     throw new \InvalidArgumentException('Source not found');
                 }
             }
+        }
+        if (count($files) == 0) {
+            throw new \InvalidArgumentException('No files found');
         }
         return $files;
     }
