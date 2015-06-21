@@ -181,6 +181,66 @@ This is the main command that gives you access to following options (specify one
 | `--classes`   | `-c`         | This detects all the classes in the specified sources (where available) and shows what other classes they are using and how. |
 | `--details`   | `-d`         | This shows all the details (verbose!)                                                                                        |
 
+#### Examples:
+
+##### Modules `-m|--modules`	
+```
+n98-magerun.phar mpmd:dependencycheck -m app/code/core/Mage/Captcha
++---------------+----------------+
+| Source Module | Target Module  |
++---------------+----------------+
+| Mage_Captcha  | Mage_Core      |
+| Mage_Captcha  | Mage_Admin     |
+| Mage_Captcha  | Mage_Customer  |
+| Mage_Captcha  | Mage_Checkout  |
+| Mage_Captcha  | Mage_Adminhtml |
++---------------+----------------+
+```
+
+##### Libraries `-l|--libraries`
+```
+n98-magerun.phar mpmd:dependencycheck -l app/code/core/Mage/Captcha
++-----------+
+| Libraries |
++-----------+
+| Varien    |
+| Zend      |
++-----------+
+```
+
+##### Classes `-c|--classes`
+```
+/n98-magerun.phar mpmd:dependencycheck -c app/code/core/Mage/Captcha
++------------------------------------------+-----------------------------------------+--------------------------+
+| Source class                             | Target Class                            | Access Types             |
++------------------------------------------+-----------------------------------------+--------------------------+
+| Mage_Captcha_Block_Captcha               | Mage_Core_Block_Template                | extends                  |
+| Mage_Captcha_Block_Captcha               | Mage_Captcha_Helper_Data                | helper                   |
+| Mage_Captcha_Block_Captcha_Zend          | Mage_Core_Block_Template                | extends                  |
+| Mage_Captcha_Block_Captcha_Zend          | Mage_Captcha_Helper_Data                | helper                   |
+| Mage_Captcha_Model_Config_Form_Backend   | Mage_Captcha_Model_Config_Form_Abstract | extends                  |
+| Mage_Captcha_Model_Config_Form_Abstract  | Mage_Core_Model_Config_Data             | extends                  |
+| Mage_Captcha_Model_Config_Form_Frontend  | Mage_Captcha_Model_Config_Form_Abstract | extends                  |
+...
+```
+
+##### Details `-d|--details`
+```
+n98-magerun.phar mpmd:dependencycheck -d app/code/core/Mage/Captcha
++------------------------------------------------------------------------+------------------+-------------------------------------------------+
+| File                                                                   | Access Type      | Class                                           |
++------------------------------------------------------------------------+------------------+-------------------------------------------------+
+| app/code/core/Mage/Captcha/Block/Captcha.php                           | class            | Mage_Captcha_Block_Captcha                      |
+| app/code/core/Mage/Captcha/Block/Captcha.php                           | extends          | Mage_Core_Block_Template                        |
+| app/code/core/Mage/Captcha/Block/Captcha.php                           | helper           | Mage_Captcha_Helper_Data                        |
+| app/code/core/Mage/Captcha/Block/Captcha/Zend.php                      | class            | Mage_Captcha_Block_Captcha_Zend                 |
+| app/code/core/Mage/Captcha/Block/Captcha/Zend.php                      | extends          | Mage_Core_Block_Template                        |
+| app/code/core/Mage/Captcha/Block/Captcha/Zend.php                      | helper           | Mage_Captcha_Helper_Data                        |
+| app/code/core/Mage/Captcha/etc/system.xml                              | source_model     | Mage_Adminhtml_Model_System_Config_Source_Yesno |
+| app/code/core/Mage/Captcha/etc/system.xml                              | source_model     | Mage_Captcha_Model_Config_Font                  |
+...
+```
+
 ### Command: `mpmd:dependencychecker:verify`
 
 This command compares the actual dependencies found in the code with the ones declared for a given module (specify with `-m <Module_Name>`)
