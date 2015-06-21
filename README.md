@@ -7,7 +7,7 @@ Some additional commands for the excellent n98-magerun Magento command-line tool
 ## Table of Contents
 
 * [`mpmd:corehacks`](#command-mpmdcorehacks)
-* [`mpmd:corehacks`](#command-mpmdcodepooloverrides)
+* [`mpmd:codepooloverrides`](#command-mpmdcodepooloverrides)
 * [Dependency Checker](#dependency-checker)
 	* [How does it work?](#how-does-it-work)
 	* [Why?](#why)
@@ -78,7 +78,7 @@ Report preview:
 
 ![Image](/docs/img/corehacks.jpg)
 
-### Command: `mpmd:corehacks`
+### Command: `mpmd:codepooloverrides`
 ```
 Usage:
  mpmd:codepooloverrides [--format[="..."]] [htmlReportOutputPath] [skipDirectories]
