@@ -445,7 +445,7 @@ Radial pattern:
 ```
 layout=twopi;
 ```
-| Configured depenendencies<br />`mpmd:dependencycheck:graph:configured 'Mage_*'` | Actual depenencies<br />`mpmd:dependencycheck:graph:module 'app/code/core/Mage/*'` |
+| Configured dependencies<br />`mpmd:dependencycheck:graph:configured 'Mage_*'` | Actual dependencies<br />`mpmd:dependencycheck:graph:module 'app/code/core/Mage/*'` |
 |--------|--------------------------------|
 | ![Image](/docs/img/twopi_small.png) | ![Image](/docs/img/twopi_actual_small.png) |
 
