@@ -6,6 +6,20 @@ Author: Fabrizio Branca ([fbrnc.net](http://fbrnc.net) / [@fbrnc](https://twitte
 
 Some additional commands for the excellent [n98-magerun Magento command-line tool](https://github.com/netz98/n98-magerun) that will help you find out how messed up a Magento instance is :)
 
+```
+n98-magerun.phar | grep mpmd
+mpmd
+ mpmd:codepooloverrides                  Find all code pool overrides
+ mpmd:corehacks                          Find all core hacks
+ mpmd:dependencycheck                    Find dependencies
+ mpmd:dependencycheck:configured         Returns the list of modules that are CONFIGURED in these module's config xml.
+ mpmd:dependencycheck:graph:class        Creates a class graph
+ mpmd:dependencycheck:graph:configured   Creates a graph of all configured depencencies.
+ mpmd:dependencycheck:graph:module       Creates a module graph
+ mpmd:dependencycheck:verify             Checks if found dependencies match a given module's xml file
+
+```
+
 ## Table of Contents
 
 * [Installation](#installation)
