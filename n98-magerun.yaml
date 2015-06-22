@@ -6,9 +6,11 @@ commands:
     - Mpmd\Magento\CoreHacksCommand
     - Mpmd\Magento\CodePoolOverridesCommand
     - Mpmd\Magento\DependencyCheckCommand
+    - Mpmd\Magento\DependencyCheckCommand\Configured
     - Mpmd\Magento\DependencyCheckCommand\Verify
     - Mpmd\Magento\DependencyCheckCommand\Classgraph
     - Mpmd\Magento\DependencyCheckCommand\Modulegraph
+    - Mpmd\Magento\DependencyCheckCommand\ConfiguredGraph
   Mpmd\Magento\DependencyCheckCommand:
     parsers:
       - Mpmd\DependencyChecker\Parser\Tokenizer

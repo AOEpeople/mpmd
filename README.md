@@ -14,11 +14,14 @@ Some additional commands for the excellent n98-magerun Magento command-line tool
 	* [Parsers](#parsers)
 	* [Handlers](#handlers)
 	* [Specifying sources](#specifying-sources)
-	* Commands
+	* Commands: Tables
 		* [`mpmd:dependencychecker`](#command-mpmddependencychecker)
 		* [`mpmd:dependencychecker:verify`](#command-mpmddependencycheckerverify)
+		* [`mpmd:dependencychecker:configured`](#command-mpmddependencycheckerconfigured)
+	* Commands: Graphs
 		* [`mpmd:dependencychecker:graph:module`](#command-mpmddependencycheckergraphmodule)
 		* [`mpmd:dependencychecker:graph:class`](#command-mpmddependencycheckergraphclass)
+		* [`mpmd:dependencychecker:graph:configured`](#command-mpmddependencycheckergraohconfigured)
 
 
 ## Installation
@@ -140,7 +143,7 @@ commands:
       - (... add your parser here ...)
 ```
 
-All parsers need to implement `Mpmd\DependencyChecker\Parser\ParserInterface`
+All parsers need to implement `Mpmd\DependencyChecker\Parser\ParserInterface`. Also checkout the `AbstractParser` that implements that interface and might be a good starting point. 
 
 ### Handlers
 
@@ -160,6 +163,25 @@ Every parser comes with a number of handlers. Here's the list of default handler
 - the module that we're testing needs to be installed into a functioning Magento environment and all dependencies must be fulfilled
 - we need to "trick" something into being `Mage_Core_Model_Config` having access to the same data but doing things slightly differently. `Mpmd\Util\MagentoFactory` takes care of that and provides access to some of the original functions like `getModelClassName()` and `getBlockClassName()`...
 
+
+#### How to add your own handler
+
+Add a new handler via n98-magerun's YAML configuration
+
+```
+commands:
+  Mpmd\Magento\DependencyCheckCommand:
+	Mpmd\DependencyChecker\Parser\Tokenizer:
+      handlers:
+        - Mpmd\DependencyChecker\Parser\Tokenizer\Handler\WhitespaceString
+        - Mpmd\DependencyChecker\Parser\Tokenizer\Handler\Interfaces
+        - (... add your tokenizer handler here ...)
+    <Parser>:
+      handlers:
+        - (... add your <parser> handler here ...)    
+```
+
+All handlers need to implement `Mpmd\DependencyChecker\HandlerInterface`. Also checkout the `AbstractHandler` that implements that interface and might be a good starting point. 
 
 ### Specifying sources
 
@@ -262,6 +284,7 @@ This command compares the actual dependencies found in the code with the ones de
 
 Example:
 
+
 ```
 n98-magerun.phar mpmd:dependencycheck:verify -m Mage_Catalog app/code/core/Mage/Catalog
 
@@ -288,10 +311,33 @@ In this example you can see how `Mage_Catalog` only declares dependencies to `Ma
 n98-magerun.phar mpmd:dependencycheck:verify -m My_Module ../.modman/My_Module
 ```
 
+### Command: `mpmd:dependencychecker:configured`
+
+This command returns a list of all **configured** dependencies (taken from config xml). This (and the corresponding  `mpmd:dependencychecker:graph:configured`) is the only command that does not analyze any files but only reads the dependencies from the configuration.
+
+The command accept one or more module and also supports glob-like patterns:
+
+Examples
+```
+# Single module
+n98-magerun.phar mpmd:dependencycheck:configured My_Module
+
+# Two modules 
+n98-magerun.phar mpmd:dependencycheck:configured My_Module My_OtherModule
+
+# Wildcard(s)
+n98-magerun.phar mpmd:dependencycheck:configured 'Mage_*' 'Enterprise_*'
+
+# All modules
+n98-magerun.phar mpmd:dependencycheck:configured '*'
+```
+**Note:** since bash might replace your glob syntax with different paths in case they match something in the current directory you should wrap any glob patterns in `'single quotes'`/ 
+
 
 ### Command: `mpmd:dependencychecker:graph:module`
 
-This command will render a dependency graph for the relevant modules as a `dot` file. Use the Graphviz tool (Ubuntu: `sudo apt-get install graphviz`) to create a svg (or many other formats):
+This command will render a dependency graph for the relevant modules as a `dot` file. Use the Graphviz tool (Ubuntu: `sudo apt-get install graphviz`) to create a svg (or many other formats).
+Feel free to modify the dot-file to match any different styling. Find a full reference on the [Graphviz website](http://www.graphviz.org/).
 
 Example:
 ```
@@ -327,3 +373,13 @@ n98-magerun.phar mpmd:dependencycheck:graph:class --group app/code/core/Mage/Cap
 | Ungrouped  | Grouped |
 |--------|--------------------------------|
 | [![Image](/docs/img/Mage_Captcha.png)](/docs/img/Mage_Captcha.svg)  | [![Image](/docs/img/Mage_Captcha_grouped.png)](/docs/img/Mage_Captcha_grouped.svg) |
+
+
+### Command: `mpmd:dependencychecker:graph:configured`
+
+This command will create a graph from the configured dependencies. The syntax is the same used in `mpmd:dependencychecker:configured`:
+
+Example:
+```
+n98-magerun.phar mpmd:dependencycheck:graph:configured 'Mage_*' | dot -Tsvg -o Mage.svg
+```

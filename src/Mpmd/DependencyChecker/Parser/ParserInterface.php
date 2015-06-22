@@ -23,9 +23,9 @@ interface ParserInterface {
     /**
      * Add a handler
      *
-     * @param \Mpmd\DependencyChecker\AbstractHandler $handler
+     * @param \Mpmd\DependencyChecker\HandlerInterface $handler
      */
-    public function addHandler(\Mpmd\DependencyChecker\AbstractHandler $handler);
+    public function addHandler(\Mpmd\DependencyChecker\HandlerInterface $handler);
 
     /**
      * Parse: Here's we the magic happens

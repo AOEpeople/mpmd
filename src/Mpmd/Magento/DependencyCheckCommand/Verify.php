@@ -56,11 +56,9 @@ class Verify extends \Mpmd\Magento\DependencyCheckCommand
             throw new \InvalidArgumentException('Could not find module.');
         }
 
-        $declaredDepenencies = array();
-        $moduleConfig = \Mage::getConfig()->getNode('modules/' . $moduleName);
-        foreach ($moduleConfig->depends->children() as $dependency) {/* @var $dependency \Mage_Core_Model_Config_Element  */
-            $declaredDepenencies[] = $dependency->getName();
-        }
+        $divUtil = new \Mpmd\Util\Div();
+
+        $declaredDepenencies = $divUtil->getDeclaredDepenenciesForModule($moduleName);
 
         $collector = $this->collectData();
 
@@ -68,7 +66,6 @@ class Verify extends \Mpmd\Magento\DependencyCheckCommand
         $collector->filter(array('Mage'));
 
         // filter the default classes that come with PHP
-        $divUtil = new \Mpmd\Util\Div();
         $collector->filter($divUtil->getDefaultClasses());
 
         // filter library files
