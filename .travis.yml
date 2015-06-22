@@ -10,3 +10,9 @@ matrix:
     - php: hhvm
 script:
   - phpunit --debug
+notifications:
+  email:
+    recipients:
+      - travis@fabrizio-branca.de
+    on_success: always
+    on_failure: always
