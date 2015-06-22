@@ -392,3 +392,39 @@ $ n98-magerun.phar mpmd:dependencycheck:graph:configured 'Mage_*' | dot -Tsvg -o
 ```
 
 **Disclaimer:** There's a good chance that some dependencies are **not detected** at all (actually if variables are being used when instanciating object like  `Mage::getModel($modelClass);`, `Mage::getModel("acme/$model");` or `new $class()` then mpmd is ignoring those - and there might be some more scenarious where mpmd might be missing some dependencies). Please do not solely rely on the mpmd report while refactoring or before removing any modules!
+
+### Interesting Graphviz commands
+
+There's a ton of things you can do with Graphviz. Starting from choosing different layouts to clustering nodes and coloring nodes and/or edges differently (e.g. by namespace or code pool?). Here are some examples:
+
+In the following examples I replaced all nodes with simple black dots connected with black lines:
+```
+edge [arrowhead=vee, arrowtail=inv, arrowsize=.7, color="black"];
+node [fontname="verdana", fixedsize=true, width="0.3", shape=point, style="filled", fillcolor="black"];
+```
+
+Replace splines with straight lines:
+```
+splines=false;
+```
+Circle pattern:
+```
+layout=circo;
+```
+![](docs/img/circo.png)
+
+Radial pattern:
+```
+layout=twopi;
+```
+| Configured depenendencies<br />`mpmd:dependencycheck:graph:configured 'Mage_*'` | Actual depenencies<br />`mpmd:dependencycheck:graph:module 'app/code/core/Mage/*'` |
+|--------|--------------------------------|
+| ![Image](/docs/img/twopi_small.png) | ![Image](/docs/img/twopi_actual_small.png) |
+
+No overlapping:
+```
+overlap=false;
+layout=twopi;
+```
+([Click for svg](/docs/img/mage.svg))
+[![Image](/docs/img/mage.png)](/docs/img/mage.svg)

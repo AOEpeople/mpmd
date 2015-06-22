@@ -68,6 +68,7 @@ class Classgraph extends \Mpmd\Magento\DependencyCheckCommand
         $output = array();
         $output[] = 'digraph callgraph {';
         $output[] = '';
+        $output[] = '    splines=false;';
         $output[] = '    rankdir=LR;';
         $output[] = '    edge[arrowhead=vee, arrowtail=inv, arrowsize=.7, color="#dddddd"];';
         $output[] = '    node [fontname="verdana", shape=plaintext, style="filled", fillcolor="#dddddd"];';
