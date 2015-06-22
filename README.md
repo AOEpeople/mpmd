@@ -156,13 +156,13 @@ Every parser comes with a number of handlers. Here's the list of default handler
 
 | Parser    | Handler               | Will process                     | What it does                                                                                         |
 |-----------|-----------------------|----------------------------------|------------------------------------------------------------------------------------------------------|
-| Tokenizer | Interfaces            | `T_IMPLEMENTS`                   | Finds interfaces: `class A implements B {}`                                                          |
-| Tokenizer | WhitespaceString      | `T_NEW`, `T_EXTENDS`, `T_CLASS`  | Finds creating classes with new: `$a = new B();`<br />Finds extended classes: `class A extends B {}` |
-| Tokenizer | StaticCalls           | `T_DOUBLE_COLON`                 | Finds static calls: `A::B` and `A::B()`                                                               |
-| Tokenizer | TypeHints             | `T_FUNCTION`                     | Finds type hints: `function a (B $b) {}`                                                             |
-| Tokenizer | MagentoFactoryMethods | `T_STRING` for specific keywords | Finds classes instantiated with one of Magento's factory methods and resolves them to real PHP classes not taking rewrites into account:<br />`Mage::getModel()`<br />`Mage::getSingleton()`<br />`Mage::getResourceModel()`<br />`Mage::getResourceSingleton()`<br />`$this->getLayout()->createBlock()`<br />`Mage::getBlockSingleton()`<br />`Mage::helper()`<br />`Mage::getResourceHelper()`<br />`Mage::getControllerInstance()`<br />                                                                                                  |
-| Xpath     | LayoutXml             | All xml files                    | Finds blocks and resolves the into real PHP classes: `<block type="core/text">`                      |
-| Xpath     | SystemXml             | All xml files                    | Finds references to models in system.xml files:<br />`<frontend_model>adminhtml/system_config_form_field_notification</frontend_model>`<br />`<source_model>adminhtml/system_config_source_yesno</source_model>`<br />`<backend_model>adminhtml/system_config_backend_store</backend_model>`                                                                                                     |
+| [Tokenizer](src/Mpmd/DependencyChecker/Parser/Tokenizer.php) | [Interfaces](src/Mpmd/DependencyChecker/Parser/Tokenizer/Handler/Interfaces.php)            | `T_IMPLEMENTS`                   | Finds interfaces: `class A implements B {}`                                                          |
+| [Tokenizer](src/Mpmd/DependencyChecker/Parser/Tokenizer.php) | [WhitespaceString](src/Mpmd/DependencyChecker/Parser/Tokenizer/Handler/WhitespaceString.php)      | `T_NEW`, `T_EXTENDS`, `T_CLASS`  | Finds creating classes with new: `$a = new B();`<br />Finds extended classes: `class A extends B {}` |
+| [Tokenizer](src/Mpmd/DependencyChecker/Parser/Tokenizer.php) | [StaticCalls](src/Mpmd/DependencyChecker/Parser/Tokenizer/Handler/StaticCalls.php)           | `T_DOUBLE_COLON`                 | Finds static calls: `A::B` and `A::B()`                                                               |
+| [Tokenizer](src/Mpmd/DependencyChecker/Parser/Tokenizer.php) | [TypeHints](src/Mpmd/DependencyChecker/Parser/Tokenizer/Handler/TypeHints.php)             | `T_FUNCTION`                     | Finds type hints: `function a (B $b) {}`                                                             |
+| [Tokenizer](src/Mpmd/DependencyChecker/Parser/Tokenizer.php) | [MagentoFactoryMethods](src/Mpmd/DependencyChecker/Parser/Tokenizer/Handler/MagentoFactoryMethods.php) | `T_STRING` for specific keywords | Finds classes instantiated with one of Magento's factory methods and resolves them to real PHP classes not taking rewrites into account:<br />`Mage::getModel()`<br />`Mage::getSingleton()`<br />`Mage::getResourceModel()`<br />`Mage::getResourceSingleton()`<br />`$this->getLayout()->createBlock()`<br />`Mage::getBlockSingleton()`<br />`Mage::helper()`<br />`Mage::getResourceHelper()`<br />`Mage::getControllerInstance()`<br />                                                                                                  |
+| [Xpath](src/Mpmd/DependencyChecker/Parser/Xpath.php)     | [LayoutXml](src/Mpmd/DependencyChecker/Parser/Xpath/Handler/LayoutXml.php)             | All xml files                    | Finds blocks and resolves the into real PHP classes: `<block type="core/text">`                      |
+| [Xpath](src/Mpmd/DependencyChecker/Parser/Xpath.php)     | [SystemXml](src/Mpmd/DependencyChecker/Parser/Xpath/Handler/SystemXml.php)             | All xml files                    | Finds references to models in system.xml files:<br />`<frontend_model>adminhtml/system_config_form_field_notification</frontend_model>`<br />`<source_model>adminhtml/system_config_source_yesno</source_model>`<br />`<backend_model>adminhtml/system_config_backend_store</backend_model>`                                                                                                     |
 
 **Note:** `MagentoFactoryMethods`, `LayoutXml` and `SystemXml` need to resolve Magento classpaths into real PHP classes. The challenge hereby is NOT to take rewrites into account since rewriting a class is a mechanism that was introduced to ALLOW decoupling without dependending on each other. In order to leverage Magento and it's configuration to resolve the class paths but not take the rewrite into accounts 
 - the module that we're testing needs to be installed into a functioning Magento environment and all dependencies must be fulfilled
@@ -171,7 +171,7 @@ Every parser comes with a number of handlers. Here's the list of default handler
 
 #### How to add your own handler
 
-Add a new handler via n98-magerun's YAML configuration
+Add a new handler via [n98-magerun's YAML configuration](https://github.com/netz98/n98-magerun/wiki/Config) (also checkout [n98-magerun's documentation for custom commands](https://github.com/netz98/n98-magerun/wiki/Add-custom-commands))
 
 ```
 commands:
@@ -186,7 +186,7 @@ commands:
         - (... add your <parser> handler here ...)    
 ```
 
-All handlers need to implement `Mpmd\DependencyChecker\HandlerInterface`. Also checkout the `AbstractHandler` that implements that interface and might be a good starting point. 
+All handlers need to implement [`Mpmd\DependencyChecker\HandlerInterface`](src/Mpmd/DependencyChecker/HandlerInterface.php). Also checkout the [`AbstractHandler`](src/Mpmd/DependencyChecker/AbstractHandler.php) and the inheriting abstract handlers for the [tokenizer parser](src/Mpmd/DependencyChecker/Parser/Tokenizer/Handler/AbstractHandler.php) and the [xpath parser](src/Mpmd/DependencyChecker/Parser/Xpath/Handler/AbstractHandler.php) that implement that interface and might be a good starting point. 
 
 ### Specifying sources
 
@@ -210,7 +210,7 @@ $ n98-magerun.phar mpmd:dependencycheck -m app/code/*/*/*/
 # Multiple locations 
 $ n98-magerun.phar mpmd:dependencycheck -m app/code/local/My/Module/ app/code/community/My/OtherModule/ app/design/frontend/mypackage
 ```
-**Note:** Please specify absolute paths or paths relative to your Magento root directory (not relative to the current directory, which might be different if n98-magerun detected Magento in a different directory (e.g. htdocs/) or you're using `--root-dir=...` to tell n98-magerun where to find your Magento root)
+**Note:** Please specify absolute paths or paths relative to your **Magento root directory** (not relative to the current directory, which might be different if n98-magerun detected Magento in a different directory (e.g. htdocs/) or you're using `--root-dir=...` to tell n98-magerun where to find your Magento root)
 
 ### Command: `mpmd:dependencychecker`
 
@@ -289,11 +289,9 @@ $ n98-magerun.phar mpmd:dependencycheck -d app/code/core/Mage/Captcha
 
 ### Command: `mpmd:dependencychecker:verify`
 
-This command compares the actual dependencies found in the code with the ones declared for a given module (specify with `-m <Module_Name>`)
+This command compares the actual dependencies detected by looking at the code with the ones declared for a given module (specify with `-m <Module_Name>`)
 
 Example:
-
-
 ```
 $ n98-magerun.phar mpmd:dependencycheck:verify -m Mage_Catalog app/code/core/Mage/Catalog
 
@@ -392,3 +390,5 @@ Example:
 ```
 $ n98-magerun.phar mpmd:dependencycheck:graph:configured 'Mage_*' | dot -Tsvg -o Mage.svg
 ```
+
+**Disclaimer:** There's a good chance that some dependencies are **not detected** at all (actually if variables are being used when instanciating object like  `Mage::getModel($modelClass);`, `Mage::getModel("acme/$model");` or `new $class()` then mpmd is ignoring those - and there might be some more scenarious where mpmd might be missing some dependencies). Please do not solely rely on the mpmd report while refactoring or before removing any modules!
