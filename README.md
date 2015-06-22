@@ -1,16 +1,18 @@
 # Magento Project Mess Detector
 
-Author: [Fabrizio Branca](http://fbrnc.net)
+Author: Fabrizio Branca ([fbrnc.net](http://fbrnc.net) / [@fbrnc](https://twitter.com/fbrnc))
 
 [![Build Status](https://travis-ci.org/AOEpeople/mpmd.svg)](https://travis-ci.org/AOEpeople/mpmd)
 
-Some additional commands for the excellent n98-magerun Magento command-line tool that will help you to find out how messed up a Magento instance is :)
+Some additional commands for the excellent [n98-magerun Magento command-line tool](https://github.com/netz98/n98-magerun) that will help you find out how messed up a Magento instance is :)
 
 ## Table of Contents
 
-* [`mpmd:corehacks`](#command-mpmdcorehacks)
-* [`mpmd:codepooloverrides`](#command-mpmdcodepooloverrides)
-* [Dependency Checker](#dependency-checker)
+* [Installation](#installation)
+* **Compare files**
+	* [`mpmd:corehacks`](#command-mpmdcorehacks)
+	* [`mpmd:codepooloverrides`](#command-mpmdcodepooloverrides)
+* **[Dependency Checker](#dependency-checker)**
 	* [How does it work?](#how-does-it-work)
 	* [Why?](#why)
 	* [Parsers](#parsers)
@@ -32,7 +34,9 @@ There are a few options. You can check out the different options in the [MageRun
 
 Here's the easiest:
 
-1. Create `~/.n98-magerun/modules/` if it doesn't already exist. (or `/usr/local/share/n98-magerun/modules` if you prefer that)
+0. Install n98-magerun if you haven't already. Find the instructions on the [n98-magerun wiki](https://github.com/netz98/n98-magerun/wiki/Installation-and-Update).
+
+1. Create `~/.n98-magerun/modules/` if it doesn't already exist. (or `/usr/local/share/n98-magerun/modules` or put your modules inside your Magento instance in `lib/n98-magerun/modules` if you prefer that)
 ```
 mkdir -p ~/.n98-magerun/modules/
 ```
@@ -40,9 +44,9 @@ mkdir -p ~/.n98-magerun/modules/
 ```
 git clone git@github.com:AOEpeople/mpmd.git ~/.n98-magerun/modules/mpmd
 ```
-3. It should be installed.To see that it was installed, check to see if one of the new commands is in there.
+3. It should be installed. To verify that it was installed correctly, check if the new commands show up in the command list:
 ```
-n98-magerun mpmd:corehacks
+n98-magerun.phar | grep mpmd
 ```
 
 ## Commands
@@ -68,7 +72,6 @@ $ cd /var/www/magento/htdocs
 $ n98-magerun.phar mpmd:corehacks /path/to/vanilla/magento /path/to/report.html
 Comparing project files in 'var/www/magento/htdocs' to vanilla Magento code in '/path/to/vanilla/magento'...
 +----------------------+-------+
-
 | Type                 | Count |
 +----------------------+-------+
 | differentFileContent | 2     |
@@ -145,7 +148,7 @@ commands:
       - (... add your parser here ...)
 ```
 
-All parsers need to implement `Mpmd\DependencyChecker\Parser\ParserInterface`. Also checkout the `AbstractParser` that implements that interface and might be a good starting point. 
+All parsers need to implement [`Mpmd\DependencyChecker\Parser\ParserInterface`](src/Mpmd/DependencyChecker/Parser/ParserInterface.php). Also checkout the [`AbstractParser`](src/Mpmd/DependencyChecker/Parser/AbstractParser.php) that implements that interface and might be a good starting point. 
 
 ### Handlers
 
@@ -191,21 +194,21 @@ Every command (and sub-commands) of the dependency checker require you to specif
 
 ```
 # Single file:
-n98-magerun.phar mpmd:dependencycheck -m app/code/local/My/Module/Model/Test.php
+$ n98-magerun.phar mpmd:dependencycheck -m app/code/local/My/Module/Model/Test.php
 
 # Full directory:
-n98-magerun.phar mpmd:dependencycheck -m app/code/local/My/Module/
+$ n98-magerun.phar mpmd:dependencycheck -m app/code/local/My/Module/
 
 # Full modman directory (will also find the files you might have in app/design/):
-n98-magerun.phar mpmd:dependencycheck -m .modman/My_Module
+$ n98-magerun.phar mpmd:dependencycheck -m .modman/My_Module
 
 # Glob patterns are supported:
-n98-magerun.phar mpmd:dependencycheck -m app/code/local/My/*/
-n98-magerun.phar mpmd:dependencycheck -m app/code/local/*/*/
-n98-magerun.phar mpmd:dependencycheck -m app/code/*/*/*/
+$ n98-magerun.phar mpmd:dependencycheck -m app/code/local/My/*/
+$ n98-magerun.phar mpmd:dependencycheck -m app/code/local/*/*/
+$ n98-magerun.phar mpmd:dependencycheck -m app/code/*/*/*/
 
 # Multiple locations 
-n98-magerun.phar mpmd:dependencycheck -m app/code/local/My/Module/ app/code/community/My/OtherModule/ app/design/frontend/mypackage
+$ n98-magerun.phar mpmd:dependencycheck -m app/code/local/My/Module/ app/code/community/My/OtherModule/ app/design/frontend/mypackage
 ```
 **Note:** Please specify absolute paths or paths relative to your Magento root directory (not relative to the current directory, which might be different if n98-magerun detected Magento in a different directory (e.g. htdocs/) or you're using `--root-dir=...` to tell n98-magerun where to find your Magento root)
 
@@ -224,7 +227,8 @@ This is the main command that gives you access to following options (specify one
 
 ##### Modules `-m|--modules`	
 ```
-n98-magerun.phar mpmd:dependencycheck -m app/code/core/Mage/Captcha
+$ n98-magerun.phar mpmd:dependencycheck -m app/code/core/Mage/Captcha
+
 +---------------+----------------+
 | Source Module | Target Module  |
 +---------------+----------------+
@@ -238,7 +242,8 @@ n98-magerun.phar mpmd:dependencycheck -m app/code/core/Mage/Captcha
 
 ##### Libraries `-l|--libraries`
 ```
-n98-magerun.phar mpmd:dependencycheck -l app/code/core/Mage/Captcha
+$ n98-magerun.phar mpmd:dependencycheck -l app/code/core/Mage/Captcha
+
 +-----------+
 | Libraries |
 +-----------+
@@ -249,7 +254,8 @@ n98-magerun.phar mpmd:dependencycheck -l app/code/core/Mage/Captcha
 
 ##### Classes `-c|--classes`
 ```
-/n98-magerun.phar mpmd:dependencycheck -c app/code/core/Mage/Captcha
+$ n98-magerun.phar mpmd:dependencycheck -c app/code/core/Mage/Captcha
+
 +------------------------------------------+-----------------------------------------+--------------------------+
 | Source class                             | Target Class                            | Access Types             |
 +------------------------------------------+-----------------------------------------+--------------------------+
@@ -265,7 +271,8 @@ n98-magerun.phar mpmd:dependencycheck -l app/code/core/Mage/Captcha
 
 ##### Details `-d|--details`
 ```
-n98-magerun.phar mpmd:dependencycheck -d app/code/core/Mage/Captcha
+$ n98-magerun.phar mpmd:dependencycheck -d app/code/core/Mage/Captcha
+
 +------------------------------------------------------------------------+------------------+-------------------------------------------------+
 | File                                                                   | Access Type      | Class                                           |
 +------------------------------------------------------------------------+------------------+-------------------------------------------------+
@@ -288,7 +295,7 @@ Example:
 
 
 ```
-n98-magerun.phar mpmd:dependencycheck:verify -m Mage_Catalog app/code/core/Mage/Catalog
+$ n98-magerun.phar mpmd:dependencycheck:verify -m Mage_Catalog app/code/core/Mage/Catalog
 
 +---------------------+---------------------------------------------+--------------+
 | Declared Dependency | Actual Dependency                           | Status       |
@@ -322,16 +329,16 @@ The command accept one or more module and also supports glob-like patterns:
 Examples
 ```
 # Single module
-n98-magerun.phar mpmd:dependencycheck:configured My_Module
+$ n98-magerun.phar mpmd:dependencycheck:configured My_Module
 
 # Two modules 
-n98-magerun.phar mpmd:dependencycheck:configured My_Module My_OtherModule
+$ n98-magerun.phar mpmd:dependencycheck:configured My_Module My_OtherModule
 
 # Wildcard(s)
-n98-magerun.phar mpmd:dependencycheck:configured 'Mage_*' 'Enterprise_*'
+$ n98-magerun.phar mpmd:dependencycheck:configured 'Mage_*' 'Enterprise_*'
 
 # All modules
-n98-magerun.phar mpmd:dependencycheck:configured '*'
+$ n98-magerun.phar mpmd:dependencycheck:configured '*'
 ```
 **Note:** since bash might replace your glob syntax with different paths in case they match something in the current directory you should wrap any glob patterns in `'single quotes'`/ 
 
@@ -343,7 +350,7 @@ Feel free to modify the dot-file to match any different styling. Find a full ref
 
 Example:
 ```
-n98-magerun.phar mpmd:dependencycheck:graph:module app/code/core/Mage/* | dot -Tsvg -o mage.svg
+$ n98-magerun.phar mpmd:dependencycheck:graph:module app/code/core/Mage/* | dot -Tsvg -o mage.svg
 ```
 Here's a tiny(!) crop of the graph generated in this example (click the image for a full-sized svg). Sadly there are a ton of dependencies in the Magento core (and most likely also in your modules) so these graphs can quickly grow pretty huge: 
 
@@ -366,10 +373,10 @@ The graph shows different line types:
 Example: 
 ```
 # ungrouped
-n98-magerun.phar mpmd:dependencycheck:graph:class app/code/core/Mage/Captcha | dot -Tpng -o Mage_Captcha.png
+$ n98-magerun.phar mpmd:dependencycheck:graph:class app/code/core/Mage/Captcha | dot -Tpng -o Mage_Captcha.png
 
 # grouped
-n98-magerun.phar mpmd:dependencycheck:graph:class --group app/code/core/Mage/Captcha | dot -Tpng -o Mage_Captcha.png
+$ n98-magerun.phar mpmd:dependencycheck:graph:class --group app/code/core/Mage/Captcha | dot -Tpng -o Mage_Captcha.png
 ```
 
 | Ungrouped  | Grouped |
@@ -383,5 +390,5 @@ This command will create a graph from the configured dependencies. The syntax is
 
 Example:
 ```
-n98-magerun.phar mpmd:dependencycheck:graph:configured 'Mage_*' | dot -Tsvg -o Mage.svg
+$ n98-magerun.phar mpmd:dependencycheck:graph:configured 'Mage_*' | dot -Tsvg -o Mage.svg
 ```
