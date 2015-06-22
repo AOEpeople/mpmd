@@ -2,6 +2,8 @@
 
 Author: [Fabrizio Branca](http://fbrnc.net)
 
+[![Build Status](https://travis-ci.org/AOEpeople/mpmd.svg)](https://travis-ci.org/AOEpeople/mpmd)
+
 Some additional commands for the excellent n98-magerun Magento command-line tool that will help you to find out how messed up a Magento instance is :)
 
 ## Table of Contents
