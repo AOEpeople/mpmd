@@ -125,6 +125,8 @@ Report preview:
 
 ## Dependency Checker
 
+![](/docs/img/graph.png)
+
 The dependency checker parses one or more files or directories and detects PHP classes that are being "used" there. 
 
 ### How does it work?
