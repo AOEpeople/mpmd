@@ -21,7 +21,7 @@ Some additional commands for the excellent n98-magerun Magento command-line tool
 	* Commands: Graphs
 		* [`mpmd:dependencychecker:graph:module`](#command-mpmddependencycheckergraphmodule)
 		* [`mpmd:dependencychecker:graph:class`](#command-mpmddependencycheckergraphclass)
-		* [`mpmd:dependencychecker:graph:configured`](#command-mpmddependencycheckergraohconfigured)
+		* [`mpmd:dependencychecker:graph:configured`](#command-mpmddependencycheckergraphconfigured)
 
 
 ## Installation
