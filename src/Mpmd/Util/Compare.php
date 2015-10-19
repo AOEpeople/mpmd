@@ -17,6 +17,7 @@ class Compare
     const FILE_MISSING_IN_B = 'fileMissingInB';
     const SAME_FILE_BUT_COMMENTS = 'sameFileButComments';
     const FILE_MISSING_IN_A = 'fileMissingInA';
+    const SAME_FILE_BUT_WHITESPACE = 'sameFileButWhitespace';
 
     /**
      * Compare two directories
@@ -31,10 +32,11 @@ class Compare
     public function compareDirectories($baseDirA, $baseDirB, $path='', $ignore=array())
     {
         $data = array(
-            self::DIFFERENT_FILE_CONTENT => array(),
-            self::IDENTICAL_FILES        => array(),
-            self::FILE_MISSING_IN_B      => array(),
-            self::SAME_FILE_BUT_COMMENTS => array(),
+            self::DIFFERENT_FILE_CONTENT   => array(),
+            self::IDENTICAL_FILES          => array(),
+            self::FILE_MISSING_IN_B        => array(),
+            self::SAME_FILE_BUT_COMMENTS   => array(),
+            self::SAME_FILE_BUT_WHITESPACE => array(),
         );
         if ($handle = opendir($baseDirA . $path)) {
             while ($file = readdir($handle)) {
@@ -80,7 +82,11 @@ class Compare
             return self::IDENTICAL_FILES;
         }
         $extension = strtolower(pathinfo($aFile, PATHINFO_EXTENSION));
-        if (in_array($extension, array('php', 'phtml', 'xml'))
+        
+        $additionalCheck = in_array($extension, array('php', 'phtml', 'xml'));
+        if ($this->getFileContentWithoutWhitespace($aFile) === $this->getFileContentWithoutWhitespace($bFile)) {
+            return self::SAME_FILE_BUT_WHITESPACE;
+        } elseif ($additionalCheck
             && ($this->getFileContentWithoutComments($aFile) === $this->getFileContentWithoutComments($bFile))
         ) {
             return self::SAME_FILE_BUT_COMMENTS;
@@ -132,6 +138,20 @@ class Compare
         } else {
             throw new \Exception("$extension is not supported here");
         }
+    }
+    
+    /**
+     * Get file content (without whitespace characters)
+     * 
+     * @param $path
+     */
+    public function getFileContentWithoutWhitespace($path)
+    {
+        $fileStr = file_get_contents($path);
+        $lines = explode("\n", $fileStr);
+        $lines = array_map('trim', $lines);
+        $fileStr = implode("\n", $lines);
+        return $fileStr;
     }
 
     /**
