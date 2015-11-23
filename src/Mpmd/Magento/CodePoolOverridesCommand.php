@@ -55,7 +55,7 @@ class CodePoolOverridesCommand extends \N98\Magento\Command\AbstractMagentoComma
         $this->detectMagento($output, true);
         $this->initMagento();
 
-        $this->_output->writeln("<info>Comparing project files in '$this->_magentoRootFolder' to vanilla Magento code in '$pathToVanillaCore'...</info>");
+        $this->_output->writeln("<info>Analysing project files in '$this->_magentoRootFolder' for code pool overrides...</info>");
 
         $skipDirectories = $this->_input->getArgument('skipDirectories');
 
@@ -63,13 +63,6 @@ class CodePoolOverridesCommand extends \N98\Magento\Command\AbstractMagentoComma
             $skipDirectories = '.svn' . PATH_SEPARATOR . '.git';
         }
         $compareUtil = new \Mpmd\Util\Compare();
-
-        $data = $compareUtil->compareDirectories(
-            $pathToVanillaCore,
-            $this->_magentoRootFolder,
-            '',
-            explode(PATH_SEPARATOR, $skipDirectories)
-        );
 
         $pools = array(
             0 => 'local',
