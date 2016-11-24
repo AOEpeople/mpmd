@@ -39,7 +39,7 @@ class Compare
             self::SAME_FILE_BUT_WHITESPACE => array(),
         );
         if ($handle = opendir($baseDirA . $path)) {
-            while ($file = readdir($handle)) {
+            while (($file = readdir($handle)) !== false) {
                 if ($file == '.' || $file == '..' || in_array($file, $ignore)) {
                     continue;
                 }
