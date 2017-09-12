@@ -29,7 +29,7 @@ class CoreHacksCommand extends \N98\Magento\Command\AbstractMagentoCommand
         $this
             ->setName('mpmd:corehacks')
             ->addArgument('pathToVanillaCore', InputArgument::REQUIRED, 'Path to Vanilla Core used for comparison')
-            ->addArgument('htmlReportOutputPath', InputArgument::OPTIONAL, 'Path to where the HTML report will be written')
+            ->addArgument('htmlReportOutputFile', InputArgument::OPTIONAL, 'Filename to where the HTML report will be written')
             ->addArgument('skipDirectories', InputArgument::OPTIONAL, '\''.PATH_SEPARATOR.'\'-separated list of directories that will not be considered (defaults to \'.svn'.PATH_SEPARATOR.'.git\')')
             ->setDescription('Find all core hacks')
             ->addOption(
@@ -63,18 +63,22 @@ class CoreHacksCommand extends \N98\Magento\Command\AbstractMagentoCommand
 
         $this->_output->writeln("<info>Comparing project files in '$this->_magentoRootFolder' to vanilla Magento code in '$pathToVanillaCore'...</info>");
 
-        $skipDirectories = $this->_input->getArgument('skipDirectories');
-
-        if (empty($skipDirectories)) {
-            $skipDirectories = '.svn' . PATH_SEPARATOR . '.git';
+        $skipDirectories = array_filter(explode(PATH_SEPARATOR, $this->_input->getArgument('skipDirectories')));
+        if (!$skipDirectories) {
+            $skipDirectories = array(
+                '.svn',
+                '.git',
+            );
         }
+        array_walk($skipDirectories, 'self::stripSlashes');
+
         $compareUtil = new \Mpmd\Util\Compare();
 
         $data = $compareUtil->compareDirectories(
             $pathToVanillaCore,
             $this->_magentoRootFolder,
             '',
-            explode(PATH_SEPARATOR, $skipDirectories)
+            $skipDirectories
         );
 
         $table = array();
@@ -86,9 +90,9 @@ class CoreHacksCommand extends \N98\Magento\Command\AbstractMagentoCommand
             ->setHeaders(array('Type', 'Count'))
             ->renderByFormat($output, $table, $input->getOption('format'));
 
-        $htmlReportOutputPath = $this->_input->getArgument('htmlReportOutputPath');
+        $htmlReportOutputFile = $this->_input->getArgument('htmlReportOutputFile');
 
-        if ($htmlReportOutputPath) {
+        if ($htmlReportOutputFile) {
 
             foreach (array(\Mpmd\Util\Compare::DIFFERENT_FILE_CONTENT, \Mpmd\Util\Compare::SAME_FILE_BUT_COMMENTS) as $section) {
                 $diffs[$section] = $compareUtil->getDiffs(
@@ -118,11 +122,26 @@ class CoreHacksCommand extends \N98\Magento\Command\AbstractMagentoCommand
 
             $htmlReport->addDiffData($data, $diffs, 'vanilla core', 'project');
 
-            file_put_contents($htmlReportOutputPath, $htmlReport->render());
-            $this->_output->writeln("<info>Writing HTML report to: $htmlReportOutputPath</info>");
+            $htmlReportOutputPath = dirname($htmlReportOutputFile);
+            if (!file_exists($htmlReportOutputPath)) {
+                mkdir($htmlReportOutputPath, 0755, true);
+            }
+
+            file_put_contents($htmlReportOutputFile, $htmlReport->render());
+            $this->_output->writeln("<info>Writing HTML report to: $htmlReportOutputFile</info>");
         }
 
         // if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
     }
 
+    /**
+     * Helper function to strip leading/trailing slashes, called by array_walk
+     *
+     * @param mixed $v Array value
+     * @param mixed $k Array key
+     */
+    public static function stripSlashes(&$v, $k)
+    {
+        $v = trim($v, '/');
+    }
 }
